@@ -51,7 +51,8 @@ alias gbranch.copyforce='sudo branch -C' # same as --copy --force
 alias gbranch.list='git branch -l' # lista branchs locais
 alias gbranch.remote='git branch -r' # lista branchs remotas
 alias gbranch.all='git branch -a' # lista branchs locais e remotas
-alias gbranch.view='git branch -v' # same as --verbose
+alias gbranch.verbose='git branch -v' # same as --verbose
+alias gbranch.verbose2='git branch -vv' # same as --verbose with path and the name of remote upstream
 # git - switch
 alias gswitch='sudo git switch'
 alias gswitch.force='sudo git switch -f' # same as --discard-changes
@@ -82,13 +83,26 @@ alias gadd='sudo git add'
 alias gadd.all='sudo git add -A' # same as add .
 # git - restore
 alias grestore='sudo git restore'
-alias grestore.all='sudo git restore..'
-alias grestore.commit='sudo git restore.-s' # same as --store
-alias grestore.staged='sudo git restore.-S' # same as --staged
+alias grestore.all='sudo git restore .'
+alias grestore.commit='sudo git restore -s' # same as --store
+alias grestore.staged='sudo git restore -S' # same as --staged
 # git - commit
 alias gcommit='sudo git commit'
 alias gcommit.all='sudo git commit -a' # commit untrecked files
 alias gcommit.msg='sudo git commit -m'
+# git - reset
+alias greset='git reset'
+alias greset.soft='git reset --soft' # undo specific commit (not pushed) and keep the changes
+alias greset.hard='git reset --hard' # undo specific commit (not pushed) and discard the changes
+alias greset.softlast='git reset --soft HEAD^' # undo last commit (not pushed) and keep the changes
+alias greset.hardlast='git reset --hard HEAD^' # undo last commit (not pushed) and discard the changes
+alias greset.softuntil='x(){ git reset --soft HEAD~"$1"; unset -f x; }; x' # undo 'n' lasts commits (not pushed) and keep all changes
+alias greset.harduntil='x(){ git reset --hard HEAD~"$1"; unset -f x; }; x' # undo 'n' lasts commits (not pushed) and discard all changes
+# git - revert
+alias grevert='git revert'
+alias grevert.noedit='git revert --no-edit'
+alias grevert.lastnoedit='git revert --no-edit HEAD^' # undo last commit (pushed)
+alias grevert.last='git revert HEAD^' # undo last commit (pushed) and creates new commit
 # git - log
 alias glog='git log'
 alias glog.one='git log --oneline'
@@ -151,35 +165,34 @@ alias my.hml='mysql --host=35.199.121.211 --database=setec_hml --user=sistema-hm
 alias my.prd='mysql --host=35.199.121.211 --database=setec_producao --user=setec_producao --password=ibfmulEysG9iH7d2'
 alias my.dev='mysql --host=localhost --database=setec_dev --user=setec --password=setec'
 # mysql dump
-alias my.dump@hml='mysqldump@--skip-lock-tables --host=35.199.121.211 setec_hml --user=sistema-hml --password=ibfmulEysG9iH7d2 --triggers --routine --events --verbose'
-alias my.dump@prd='mysqldump@--skip-lock-tables --host=35.199.121.211 setec_producao --user=setec_producao --password=ibfmulEysG9iH7d2 --triggers --routines --events --verbose'
-alias my.dump@dev='mysqldump@--skip-lock-tables --host=localhost setec_dev --user=setec --password=setec --triggers --routines --events --verbose'
+alias my.dump@dev='mysqldump --skip-lock-tables --host=localhost setec_dev --user=setec --password=setec --triggers --routines --events --verbose'
+alias my.dump@hml='mysqldump --skip-lock-tables --host=35.199.121.211 setec_hml --user=sistema-hml --password=ibfmulEysG9iH7d2 --triggers --routine --events --verbose'
+alias my.dump@prd='mysqldump --skip-lock-tables --host=35.199.121.211 setec_producao --user=setec_producao --password=ibfmulEysG9iH7d2 --triggers --routines --events --verbose'
 # mysql restore
 alias my.restore@hml='x(){ pv "$1" | mysql --host=35.199.121.211 --database=setec_hml --user=sistema-hml --password=ibfmulEysG9iH7d2; unset -f x; }; x'
 alias my.restore@prd='x(){ pv "$1" | mysql --host=35.199.121.211 --database=setec_producao --user=setec_producao --password=ibfmulEysG9iH7d2; unset -f x; }; x'
 alias my.restore@dev='x(){ pv "$1" | mysql --host=localhost --database=setec_dev --user=setec --password=setec; unset -f x; }; x'
+alias my.restore@dev2='mysql -h localhost -u setec -p setec setec_dev'
 # mysql copy dump
 alias my.backup='x(){ pv "$1" > /mnt/c/Users/Limao/Documents/bancada/setec/bak_bancos/"$1"; unset -f x; }; x'
 
 # postgresql
 # postgresql access
+alias pg.dev='PGPASSWORD=setec psql -h localhost -d setec_permis_dev -U setec'
 alias pg.hml='PGPASSWORD=ibfmulEysG9iH7d2 psql -h 35.198.36.88 -d setec_permis_hml -U sistema-hml'
 alias pg.prd='PGPASSWORD=ibfmulEysG9iH7d2 psql -h 35.198.36.88 -d setec_permis -U sistema-hml'
-alias pg.dev='PGPASSWORD=setec psql -h localhost -d setec_permis_dev -U setec'
 # postgresql dump
-alias pg.dump@hml='PGPASSWORD=ibfmulEysG9iH7d2 pg_dump -h 35.198.36.88 -Fc setec_permis_hml -U sistema-hml --verbose'
-alias pg.dump@prd='PGPASSWORD=ibfmulEysG9iH7d2 pg_dump -h 35.198.36.88 setec_permis -U sistema-hml -v -c -x -o -O -n public -f'
-alias pg.dump@dev='PGPASSWORD=setec pg_dump -h localhost -Fc setec_permis_dev -U setec --verbose'
+alias pg.dump@dev='PGPASSWORD=setec pg_dump -h localhost -U setec -W -d setec_permis_dev -v --clean --no-owner --exclude-table=syslog --no-privileges --inserts'
+alias pg.dump@hml='PGPASSWORD=ibfmulEysG9iH7d2 pg_dump -h 35.198.36.88 -U sistema-hml -W -d setec_permis_hml -v --clean --no-owner --exclude-table=syslog --no-privileges --inserts'
+alias pg.dump@prd='PGPASSWORD=ibfmulEysG9iH7d2 pg_dump -h 35.198.36.88 -U sistema-hml -W -d setec_permis -v --clean --no-owner --exclude-table=syslog --no-privileges --inserts '
 # postgresql restore
-alias pg.restore@hml='x(){ pv "$1" | PGPASSWORD=ibfmulEysG9iH7d2 pg_restore -h 35.198.36.88 -d setec_permis_hml -U sistema-hml --clean --no-privileges -O -n public; unset -f x; }; x'
-alias pg.restore@prd='x(){ pv "$1" | PGPASSWORD=ibfmulEysG9iH7d2 pg_restore -h 35.198.36.88 -d setec_permis -U sistema-hml --clean --no-privileges -O -n public; unset -f x; }; x'
-alias pg.restore@dev='x(){ pv "$1" | PGPASSWORD=setec pg_restore -h localhost -d setec_permis_dev -U setec --clean --no-privileges -O -n public; unset -f x; }; x'
-# postgresql copy dump
-alias pg.backup='x(){ pv "$1" > /mnt/c/Users/Limao/Documents/bancada/setec/bak_bancos/"$1"; unset -f x; }; x'
+alias pg.restore@dev='PGPASSWORD=setec pg_restore -h localhost -U setec -W -d setec_permis_dev --role=setec -v -O'
+alias pg.restore@hml='PGPASSWORD=ibfmulEysG9iH7d2 pg_restore -h 35.198.36.88 -U sistema-hml -W -d setec_permis_hml --role=sistema-hml -v -O'
+alias pg.restore@prd='PGPASSWORD=ibfmulEysG9iH7d2 pg_restore -h 35.198.36.88 -U sistema-hml -W -d setec_permis --role=sistema-hml -v -O'
 
 # set locale
 export LC_ALL=C.UTF-8
 export LANG=C.UTF-8
 
 # set date-time stamp in commands history
-export HISTTIMEFORMAT="[%Y-%m-%d %T] $USER@$HOSTNAME: "
+ export HISTTIMEFORMAT="[%Y-%m-%d %T] $USER@$HOSTNAME: "
